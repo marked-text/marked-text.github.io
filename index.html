@@ -10,12 +10,17 @@
 
     <style>
         body {
-            width:1200px;
+            font-family: Arial;
+            width: 1200px;
             margin: 0 auto;
             min-height: 100vh;
             padding: 32px;
             background: #141414;
             color: lightgrey;
+        }
+
+        a {
+            color: beige;
         }
 
         .marked-text-resizer {
@@ -131,11 +136,22 @@
 </head>
 
 <body>
+    <h1>&lt;marked-text&gt; Web Component</h1>
+    <p>
+        <a href="https://github.com/marked-text/marked-text.github.io">GitHub Repository</a>
+    </p>
+    <p>
+        Those purple things are resize handles. I did not want to waste more Tokens on making this page look better.
+    </p>
+    <p>See page source for usage</p>
+    
+    <!-- Web Component processed lightDOM, moves the text to shadowDOM where a full size *background-image* is created -->
     <marked-text color="rebeccapurple">
         Charlie Brown was not very good at <mark-text>flying kites</mark-text>. Every year the kite-eating tree would
         get him. Every single
         year. But
-        he always tried again, because <mark-text color="firebrick" seed="0">that's the kind of person Charlie Brown was</mark-text>. Snoopy didn't
+        he always tried again, because <mark-text color="firebrick" seed="0">that's the kind of person Charlie Brown
+            was</mark-text>. Snoopy didn't
         worry about things
         like that.
         Snoopy lay on top of his doghouse and thought about supper. Lucy sat in her psychiatry booth and charged five
@@ -147,7 +163,8 @@
         he
         agreed, but he wasn't sure he disagreed either, and <mark-text>that in-between feeling was very familiar to
             him.</mark-text>
-        <p marktext color="darkgoldenrod">Sometimes I lie awake at night, and I ask, "Where have I gone wrong?" Then a voice says to me, "This
+        <p marktext color="darkgoldenrod">Sometimes I lie awake at night, and I ask, "Where have I gone wrong?" Then a
+            voice says to me, "This
             is going
             to
             take
@@ -216,19 +233,30 @@
         <p>An extract from WCQ - A Web Components Course</p>
 
         <h2>&lt;marked-text&gt;</h2>
-        <p><code>&lt;marked-text&gt;</code> is a lightweight web component that moves its authored content into shadow DOM, measures nested highlight targets, and paints a single SVG background layer that looks like hand-drawn marker ink behind inline text and block rectangles.</p>
+        <p><code>&lt;marked-text&gt;</code> is a lightweight web component that moves its authored content into shadow
+            DOM, measures nested highlight targets, and paints a single SVG background layer that looks like hand-drawn
+            marker ink behind inline text and block rectangles.</p>
 
         <h2>Attributes</h2>
         <ul>
-            <li><code>color</code>: default highlight fill color for all marked targets. Default: <code>#facc15</code>.</li>
-            <li><code>frequency</code>: default SVG turbulence <code>baseFrequency</code>. Default: <code>0.015</code>.</li>
+            <li><code>color</code>: default highlight fill color for all marked targets. Default: <code>#facc15</code>.
+            </li>
+            <li><code>frequency</code>: default SVG turbulence <code>baseFrequency</code>. Default: <code>0.015</code>.
+            </li>
             <li><code>scale</code>: default SVG displacement scale. Default: <code>13</code>.</li>
             <li><code>seed</code>: default SVG turbulence seed. Default: <code>0</code>.</li>
         </ul>
 
-        <p>Host-level defaults can also come from CSS custom properties: <code>--marked-text-color</code>, <code>--marked-text-frequency</code>, <code>--marked-text-scale</code>, and <code>--marked-text-seed</code>. Attributes win over CSS variables when both are present.</p>
+        <p>Host-level defaults can also come from CSS custom properties: <code>--marked-text-color</code>,
+            <code>--marked-text-frequency</code>, <code>--marked-text-scale</code>, and <code>--marked-text-seed</code>.
+            Attributes win over CSS variables when both are present.
+        </p>
 
-        <p>Marked targets inside the component can override those values for a single highlight by setting <code>color</code>, <code>frequency</code>, <code>scale</code>, or <code>seed</code> on <code>mark-text</code>, or by using either those same names or the <code>marktext*</code> aliases on <code>[marktext]</code> elements.</p>
+        <p>Marked targets inside the component can override those values for a single highlight by setting
+            <code>color</code>, <code>frequency</code>, <code>scale</code>, or <code>seed</code> on
+            <code>mark-text</code>, or by using either those same names or the <code>marktext*</code> aliases on
+            <code>[marktext]</code> elements.
+        </p>
 
         <h2>Methods</h2>
         <ul>
