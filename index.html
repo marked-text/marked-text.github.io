@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mark Text</title>
+
+    <script src="marked-text.js"></script>
+
+    <style>
+        body {
+            width:1200px;
+            margin: 0 auto;
+            min-height: 100vh;
+            padding: 32px;
+            background: #141414;
+            color: lightgrey;
+        }
+
+        .marked-text-resizer {
+            position: relative;
+            display: inline-block;
+            padding: 0 16px 16px 0;
+        }
+
+        marked-text {
+            display: block;
+            font-family: "Comic Sans MS", cursive, sans-serif;
+            font-size: 21px;
+            line-height: 1.4;
+            min-width: 280px;
+            min-height: 160px;
+            width: 600px;
+            background: black;
+            color: lightgrey;
+            overflow: auto;
+
+            &mark-text {
+                display: inline;
+            }
+        }
+
+        .marked-text-handle {
+            position: absolute;
+            background: rebeccapurple;
+            border: 2px solid white;
+            border-radius: 999px;
+            box-shadow: 0 4px 12px rgb(0 0 0 / 0.35);
+            touch-action: none;
+            user-select: none;
+        }
+
+        .marked-text-handle[data-resize="e"] {
+            top: 50%;
+            right: 0;
+            width: 12px;
+            height: 72px;
+            transform: translate(50%, -50%);
+            cursor: ew-resize;
+        }
+
+        .marked-text-handle[data-resize="s"] {
+            left: 50%;
+            bottom: 0;
+            width: 72px;
+            height: 12px;
+            transform: translate(-50%, 50%);
+            cursor: ns-resize;
+        }
+
+        .marked-text-handle[data-resize="se"] {
+            right: 0;
+            bottom: 0;
+            width: 18px;
+            height: 18px;
+            transform: translate(50%, 50%);
+            cursor: nwse-resize;
+        }
+
+        .docs {
+            max-width: 760px;
+            margin-top: 48px;
+            padding: 24px 28px;
+            border: 1px solid rgb(255 255 255 / 0.12);
+            border-radius: 20px;
+            background: rgb(255 255 255 / 0.04);
+            font: 16px/1.55 Georgia, serif;
+        }
+
+        .docs h1,
+        .docs h2 {
+            margin: 0 0 16px;
+            font-family: "Trebuchet MS", sans-serif;
+            line-height: 1.2;
+        }
+
+        .docs h2 {
+            margin-top: 28px;
+            font-size: 1.25rem;
+        }
+
+        .docs p,
+        .docs ul,
+        .docs pre {
+            margin: 0 0 16px;
+        }
+
+        .docs ul {
+            padding-left: 20px;
+        }
+
+        .docs code,
+        .docs pre {
+            font-family: Consolas, "Courier New", monospace;
+        }
+
+        .docs code {
+            padding: 0.1em 0.35em;
+            border-radius: 6px;
+            background: rgb(255 255 255 / 0.08);
+        }
+
+        .docs pre {
+            overflow: auto;
+            padding: 16px;
+            border-radius: 14px;
+            background: #0f0f0f;
+        }
+    </style>
+</head>
+
+<body>
+    <marked-text color="rebeccapurple">
+        Charlie Brown was not very good at <mark-text>flying kites</mark-text>. Every year the kite-eating tree would
+        get him. Every single
+        year. But
+        he always tried again, because <mark-text color="firebrick" seed="0">that's the kind of person Charlie Brown was</mark-text>. Snoopy didn't
+        worry about things
+        like that.
+        Snoopy lay on top of his doghouse and thought about supper. Lucy sat in her psychiatry booth and charged five
+        cents for
+        advice nobody wanted. <mark-text>Good grief, said Charlie Brown, which was the truest thing he ever
+            said.</mark-text> Linus carried his
+        blanket
+        everywhere. He said security was not a crime. Charlie Brown thought about this for a long time. He wasn't sure
+        he
+        agreed, but he wasn't sure he disagreed either, and <mark-text>that in-between feeling was very familiar to
+            him.</mark-text>
+        <p marktext color="darkgoldenrod">Sometimes I lie awake at night, and I ask, "Where have I gone wrong?" Then a voice says to me, "This
+            is going
+            to
+            take
+            more than one night."</p>
+    </marked-text>
+
+    <script>
+
+        document.querySelectorAll("marked-text").forEach((element) => {
+            const wrapper = document.createElement("div");
+            wrapper.className = "marked-text-resizer";
+            element.before(wrapper);
+            wrapper.append(element);
+
+            ["e", "s", "se"].forEach((direction) => {
+                const handle = document.createElement("button");
+                handle.type = "button";
+                handle.className = "marked-text-handle";
+                handle.dataset.resize = direction;
+                handle.setAttribute("aria-label", `Resize marked text ${direction}`);
+                wrapper.append(handle);
+            });
+        });
+
+        document.addEventListener("pointerdown", (event) => {
+            const handle = event.target.closest(".marked-text-handle");
+            if (!handle) return;
+
+            const wrapper = handle.parentElement;
+            const element = wrapper.querySelector("marked-text");
+            const direction = handle.dataset.resize;
+            const startX = event.clientX;
+            const startY = event.clientY;
+            const startWidth = element.offsetWidth;
+            const startHeight = element.offsetHeight;
+            const minWidth = 280;
+            const minHeight = 160;
+
+            handle.setPointerCapture(event.pointerId);
+            event.preventDefault();
+
+            const onPointerMove = (moveEvent) => {
+                if (direction.includes("e")) {
+                    element.style.width = `${Math.max(minWidth, startWidth + moveEvent.clientX - startX)}px`;
+                }
+
+                if (direction.includes("s")) {
+                    element.style.height = `${Math.max(minHeight, startHeight + moveEvent.clientY - startY)}px`;
+                }
+            };
+
+            const stopResize = () => {
+                handle.removeEventListener("pointermove", onPointerMove);
+                handle.removeEventListener("pointerup", stopResize);
+                handle.removeEventListener("pointercancel", stopResize);
+            };
+
+            handle.addEventListener("pointermove", onPointerMove);
+            handle.addEventListener("pointerup", stopResize);
+            handle.addEventListener("pointercancel", stopResize);
+        });
+    </script>
+
+    <section class="docs" aria-labelledby="documentation-title">
+        <h1 id="documentation-title">marked-text.github.io</h1>
+        <p>An extract from WCQ - A Web Components Course</p>
+
+        <h2>&lt;marked-text&gt;</h2>
+        <p><code>&lt;marked-text&gt;</code> is a lightweight web component that moves its authored content into shadow DOM, measures nested highlight targets, and paints a single SVG background layer that looks like hand-drawn marker ink behind inline text and block rectangles.</p>
+
+        <h2>Attributes</h2>
+        <ul>
+            <li><code>color</code>: default highlight fill color for all marked targets. Default: <code>#facc15</code>.</li>
+            <li><code>frequency</code>: default SVG turbulence <code>baseFrequency</code>. Default: <code>0.015</code>.</li>
+            <li><code>scale</code>: default SVG displacement scale. Default: <code>13</code>.</li>
+            <li><code>seed</code>: default SVG turbulence seed. Default: <code>0</code>.</li>
+        </ul>
+
+        <p>Host-level defaults can also come from CSS custom properties: <code>--marked-text-color</code>, <code>--marked-text-frequency</code>, <code>--marked-text-scale</code>, and <code>--marked-text-seed</code>. Attributes win over CSS variables when both are present.</p>
+
+        <p>Marked targets inside the component can override those values for a single highlight by setting <code>color</code>, <code>frequency</code>, <code>scale</code>, or <code>seed</code> on <code>mark-text</code>, or by using either those same names or the <code>marktext*</code> aliases on <code>[marktext]</code> elements.</p>
+
+        <h2>Methods</h2>
+        <ul>
+            <li><code>scheduleRender()</code>: queues a redraw on the next animation frame.</li>
+            <li><code>render()</code>: remeasures marked targets and rebuilds the SVG highlight background.</li>
+        </ul>
+
+        <h2>Marked Targets</h2>
+        <ul>
+            <li><code>mark-text</code>: highlights wrapped inline content, including multi-line spans.</li>
+            <li><code>[marktext]</code>: highlights the element box as a single rectangle.</li>
+        </ul>
+
+        <h2>Example</h2>
+        <pre><code>&lt;marked-text style="--marked-text-scale: 18; --marked-text-seed: 2" color="rebeccapurple"&gt;
+	Charlie Brown was not very good at &lt;mark-text seed="8"&gt;flying kites&lt;/mark-text&gt;.
+	&lt;p marktext color="goldenrod" scale="22"&gt;
+		Sometimes I lie awake at night.
+	&lt;/p&gt;
+&lt;/marked-text&gt;</code></pre>
+    </section>
+</body>
+
+</html>
